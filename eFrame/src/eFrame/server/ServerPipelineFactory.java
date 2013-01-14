@@ -20,22 +20,19 @@ import eFrame.utils.Configuration;
  */
 public class ServerPipelineFactory implements ChannelPipelineFactory {
 	
-	/**
-	 * 
-	 */
 	public ChannelPipeline getPipeline() throws Exception {
-		int timeout = Integer.parseInt(Configuration.getInstance().get("timeout-sec"));
-		int maxContentLength = Integer.parseInt(Configuration.getInstance().get("maxContentLength"));
+		int timeout = Integer.parseInt(Configuration.getInstance().get("netty.timeout-sec"));
+		int maxContentLength = Integer.parseInt(Configuration.getInstance().get("netty.maxContentLength"));
 		ChannelPipeline pipeline = Channels.pipeline();
 		pipeline.addLast("timeout", new ReadTimeoutHandler(new HashedWheelTimer(), timeout));
 		pipeline.addLast("decoder", new HttpRequestDecoder());
 		pipeline.addLast("aggregator", new StreamChunkAggregator(maxContentLength));
 		pipeline.addLast("encoder", new HttpResponseEncoder());
 		pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
-		String gZipOn = Configuration.getInstance().get("gZip.enabled");
+		String gZipOn = Configuration.getInstance().get("netty.gZip.enabled");
 		if("true".equals(gZipOn)){
-			int min = Integer.parseInt(Configuration.getInstance().get("gZip.min"));
-			int level = Integer.parseInt(Configuration.getInstance().get("gZip.level"));
+			int min = Integer.parseInt(Configuration.getInstance().get("netty.gZip.min"));
+			int level = Integer.parseInt(Configuration.getInstance().get("netty.gZip.level"));
 			pipeline.addLast("gzip", new GZipCompressor(min, level));
 		}
 		

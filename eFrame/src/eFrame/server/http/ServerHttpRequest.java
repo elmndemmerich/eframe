@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,6 @@ import eFrame.server.FileChannelBuffer;
 import eFrame.server.http.paramParser.TextParser;
 import eFrame.server.http.paramParser.base.DataParser;
 import eFrame.utils.Configuration;
-import eFrame.utils.HttpUtil;
 
 /**
  * 自定义请求
@@ -149,8 +147,6 @@ public class ServerHttpRequest extends DefaultHttpRequest{
 		setGetParam();
 		setPostParam();
 		checkAndParse();
-		//String text = HttpUtil.InputStream2Text(this.body, "UTF-8");
-		//System.out.println(text);
 	}
 	
 	/**
@@ -184,29 +180,31 @@ public class ServerHttpRequest extends DefaultHttpRequest{
 	 * @throws IOException
 	 */
     private void checkAndParse() {
-        if (this.getContentType() != null) {
-        	DataParser dataParser = DataParser.parsers.get(contentType);
-            if (dataParser != null) {
-            	Map<String, String[]> params = dataParser.parse(this.body);
-            	System.out.println(params.toString());
-            } else {
-                if (contentType.startsWith("text/")) {
-                	Map<String, String[]> params =  new TextParser().parse(this.body);
-                	System.out.println(params.toString());
-                }
-            }
+    	if(this.body==null){
+    		return;
+    	}    	
+        if (this.getContentType() == null) {
+        	return;
         }
+        //这个http请求没问题才做下面的步骤
+    	DataParser dataParser = DataParser.parsers.get(contentType);
+        if (dataParser != null) {
+        	Map<String, String[]> params = dataParser.parse(this.body);
+        	this.params.put("body", params.get("body")[0]);
+        } else {
+            if (contentType.startsWith("text/")) {
+            	Map<String, String[]> params =  new TextParser().parse(this.body);
+            	this.params.put("body", params.get("body")[0]);
+            }
+        }        
         try {
 			this.body.close();
 		} catch (IOException e) {
-			//ignore
+			throw new RuntimeException(e);
 		}
     }	
 	
 	public Map<String, String> getParams() {
-		if(this.body!=null){
-			checkAndParse();
-		}
 		return params;
 	}	
 	

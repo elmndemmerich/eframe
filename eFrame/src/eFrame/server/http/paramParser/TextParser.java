@@ -24,7 +24,7 @@ public class TextParser extends DataParser{
             params.put("body", new String[] {new String(data, Encoding.UTF_8)});
             return params;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+        	throw new RuntimeException(e);
         }
     }
 

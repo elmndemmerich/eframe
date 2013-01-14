@@ -43,7 +43,6 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 	static{
 		
 	}
-	
 	/**
 	 * 根据请求， 分发
 	 * @param ctx
@@ -55,13 +54,14 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 		DefaultHttpRequest nettyRequest = (DefaultHttpRequest) e.getMessage();
 		String remoteAddress = 
 				((InetSocketAddress) ctx.getChannel().getRemoteAddress()).getAddress().getHostAddress();
+		//网页页面图标
+		if(nettyRequest.getUri().equalsIgnoreCase("/favicon.ico")){
+			return;
+		}		
 		//自定义请求
 		ServerHttpRequest request = new ServerHttpRequest(nettyRequest, remoteAddress);
 		System.out.println(request.getParams());
-		//网页页面图标
-		if(request.getUri().equalsIgnoreCase("/favicon.ico")){
-			return;
-		}		
+
 		sendTestMsg(ctx, HttpResponseStatus.OK, 
 				"the server is:"+request.getBasePath()+
 				"the request uri is:"+request.getUri());
