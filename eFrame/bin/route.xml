@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+	<!-- 
+		路由映射——外面对服务器做什么？ RESTFUL风格URL 
+	-->
+	<!-- 获取用户列表 -->
+	<route url="action/getUserList" method="action.getUserList" requsetType="POST" />
+	
+	<!-- 获取某个用户 get by id -->
+	<route url="action/getUser/{id}" method="action.getUser" requsetType="POST" />
+
+	<!-- 删除 -->
+	<route url="action/delUser/{id}" method="action.delUser" requsetType="POST" />
+	
+	<!-- 修改 -->
+	<route url="action/updateUser/{id}" method="action.updateUser" requsetType="POST" />	
+
+	<!-- 如果没有配置这个路径，但是action中有这个类，匹配不匹配下去。 可选项:true/false -->
+	<Configuration catchAll="true" />
+		
+</routes>

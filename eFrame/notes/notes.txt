@@ -1,0 +1,32 @@
+file encoding is UTF-8
+
+
+计划下接下来按顺序这个frame做啥？
+-----------1、dao层基本完成。
+
+2、完成netty基本部署。并BaseAction。大量参考play和jws。
+越来越像servlet!-_- 妹的， 个人水平有限啊。。。
+
+
+3、整合velocity。
+
+4、netty的路由，并过滤器，拦截器等。究竟是@before的注解方式， 还是说用netty底层实现一个基类？
+
+5、缓存。sb式整合到BaseDao而不是码农调用。
+
+6、日志整理。
+
+7、综合上面的东西， 其中日志整理，和请求分发，改用MQ。消息队列的形式。
+	netty的请求是线程安全的，目前是多个线程同时访问一个action，线程不安全了；
+	另外集群server的时候，需要多机器统一日志文件， 以方便运维人员管理。这里也需要MQ管理日志。
+	
+
+--0109重新整理先后顺序：
+1、编写httpRequest，httpResponse，cookies，session等对象。--这里重点参考JWS和play。
+2、handler到action类的请求分发。先还是线程不安全。
+3、整合velocity。
+--到此，框架就完全有页面可以跑跑了~
+
+后续优化：
+缓存
+过滤器
