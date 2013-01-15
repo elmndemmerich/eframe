@@ -40,7 +40,7 @@ public class Server {
 					new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),
 							Executors.newCachedThreadPool()));			
 		} catch (Exception e) {
-			throw new ServiceInitException("ERROR getting port!", e);
+			throw new ServiceInitException("ERROR constructing server! cause:"+e.getMessage(), e);
 		}
 	}
 

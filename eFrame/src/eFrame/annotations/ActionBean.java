@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ActionBean{
 	public String name();
+	public ActionType resultType() default ActionType.page;
 }

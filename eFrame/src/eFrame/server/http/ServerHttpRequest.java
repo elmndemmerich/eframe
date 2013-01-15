@@ -44,7 +44,12 @@ public class ServerHttpRequest extends DefaultHttpRequest{
 	private InputStream body = null;
 	private Map<String, eFrame.server.http.Cookie> cookies = null;
 	private Map<String, String> params = new HashMap<String, String>();
-
+	/**
+	 * 构造这个request对象。流先是在body中。
+	 * 然后第一次取params的时候，检查body对象（不关闭流）。
+	 * 此标志位用于说明取出流信息了没有。
+	 * */
+	private boolean hasTransferParam = false;
 	/**is https?*/
 	private boolean secure = false;
 
@@ -52,7 +57,7 @@ public class ServerHttpRequest extends DefaultHttpRequest{
 		try {
 			encoding = Configuration.getInstance().get("context.properties", "encoding");
 		} catch (Exception e) {
-			throw new RuntimeException("获取字符编码异常！");
+			throw new RuntimeException("error getting encoding!");
 		}		
 	}
 	
@@ -106,11 +111,15 @@ public class ServerHttpRequest extends DefaultHttpRequest{
         //UTF-8解码
         querystring = java.net.URLDecoder.decode(querystring, 
         		Configuration.getInstance().getDefault("encoding", "UTF-8".intern()));
-        String[] arrParams = querystring.split("&");
+        Str2Params(querystring);
+	}
+	
+	private void Str2Params(String str){
+        String[] arrParams = str.split("&");
         for(String temp:arrParams){
         	String[] arr = temp.split("=");
         	this.params.put(arr[0], arr[1]);
-        }	
+        }		
 	}
 	
 	/**
@@ -138,7 +147,9 @@ public class ServerHttpRequest extends DefaultHttpRequest{
 	}	
 	
 	/**
-	 * 设置get和post请求的参数。
+	 * 设置get参数。
+	 * post的信息在body中， 先不从流转化为参数；
+	 * 可能body的内容是文件？
 	 * @param nettyRequest
 	 * @throws Exception 
 	 * @throws NumberFormatException 
@@ -146,7 +157,6 @@ public class ServerHttpRequest extends DefaultHttpRequest{
 	private void setParams() throws NumberFormatException, Exception{
 		setGetParam();
 		setPostParam();
-		checkAndParse();
 	}
 	
 	/**
@@ -176,35 +186,46 @@ public class ServerHttpRequest extends DefaultHttpRequest{
     }	
 	
 	/**
-	 * 把请求体放到本request的参数map中
+	 * 懒加载，把请求体放到本request的参数map中
+	 * 不再关闭流
 	 * @throws IOException
 	 */
     private void checkAndParse() {
-    	if(this.body==null){
-    		return;
-    	}    	
-        if (this.getContentType() == null) {
-        	return;
-        }
-        //这个http请求没问题才做下面的步骤
-    	DataParser dataParser = DataParser.parsers.get(contentType);
-        if (dataParser != null) {
-        	Map<String, String[]> params = dataParser.parse(this.body);
-        	this.params.put("body", params.get("body")[0]);
-        } else {
-            if (contentType.startsWith("text/")) {
-            	Map<String, String[]> params =  new TextParser().parse(this.body);
-            	this.params.put("body", params.get("body")[0]);
+    	try{
+        	if(this.body==null){
+        		return;
+        	}    	
+            if (this.getContentType() == null) {
+            	return;
             }
-        }        
-        try {
-			this.body.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+            //这个http请求没问题才做下面的步骤
+        	DataParser dataParser = DataParser.parsers.get(contentType);
+            if (dataParser != null) {
+            	Map<String, String[]> params = dataParser.parse(this.body);
+            	String strBody = params.get("body")[0];
+            	this.Str2Params(strBody);
+            	this.params.put("body", strBody);
+            } else {
+                if (contentType.startsWith("text/")) {
+                	Map<String, String[]> params =  new TextParser().parse(this.body);
+                	String strBody = params.get("body")[0];
+                	this.Str2Params(strBody);
+                	this.params.put("body", strBody);
+                }
+            }            		
+    	}finally{
+    		this.hasTransferParam=true;
+    	}
     }	
 	
+    /**
+     * 在获取参数的时候才对body进行解析内容。
+     * @return
+     */
 	public Map<String, String> getParams() {
+		if(!this.hasTransferParam){
+			checkAndParse();			
+		}
 		return params;
 	}	
 	

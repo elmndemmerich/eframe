@@ -6,6 +6,13 @@ import org.jboss.netty.handler.codec.http.HttpContentCompressor;
 import org.jboss.netty.handler.codec.http.HttpMessage;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
+/**
+ * 解压缩gzip的请求
+ * <br>
+ * @date 2013-1-14
+ * @author LiangRL
+ * @alias E.E.
+ */
 public class GZipCompressor extends HttpContentCompressor{
 	private final int minlen;
 	

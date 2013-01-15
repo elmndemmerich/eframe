@@ -6,10 +6,11 @@ import com.entity.User;
 import com.service.Service;
 
 import eFrame.annotations.ActionBean;
+import eFrame.annotations.ActionType;
 import eFrame.annotations.Wired;
 import eFrame.server.action.BaseAction;
 
-@ActionBean(name="action")
+@ActionBean(name="action", resultType=ActionType.page)
 public class Action extends BaseAction{
 	
 	@Wired(name="service")

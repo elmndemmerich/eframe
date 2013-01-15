@@ -41,5 +41,16 @@ public class Route {
 	public void setMethod(String method) {
 		this.method = method;
 	}
-
+	
+	/**
+	 * 三者都相等才是相等
+	 * @param route
+	 * @return
+	 */
+	public boolean equals(Route route){
+		boolean flagUrl = this.url.equalsIgnoreCase(route.getUrl());
+		boolean flagMethod = this.method.equalsIgnoreCase(route.getMethod());
+		boolean flagType = this.reqMethodType.equalsIgnoreCase(route.getReqMethodType());		
+		return flagType&&flagUrl&&flagMethod;
+	}
 }
