@@ -137,10 +137,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 					Template template = Velocity.getTemplate(amt.template());
 					StringWriter sw = new StringWriter();
 					template.merge((VelocityContext)result, sw);		
-					HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-					response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset="+request.getEncoding());
-					response.setContent(ChannelBuffers.copiedBuffer(sw.toString(), CharsetUtil.UTF_8));
-					ctx.getChannel().write(response).addListener(ChannelFutureListener.CLOSE);
+					this.sendMsg(ctx, HttpResponseStatus.OK, sw.toString());
 				}
 				
 				//根据方法的注解，设定response，并且输出result
@@ -176,7 +173,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 
 	private void sendMsg(ChannelHandlerContext ctx, HttpResponseStatus status, String msg) {
 		HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status);
-		response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset="+Encoding.UTF_8);
+		response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset="+Encoding.UTF_8);
 		response.setContent(ChannelBuffers.copiedBuffer(msg, CharsetUtil.UTF_8));
 		ctx.getChannel().write(response).addListener(ChannelFutureListener.CLOSE);
 	}	
@@ -188,7 +185,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 	 */
 	private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
 		HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status);
-		response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset="+Encoding.UTF_8);
+		response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset="+Encoding.UTF_8);
 		response.setContent(ChannelBuffers.copiedBuffer("Failure: " + status.toString() + "\r\n", CharsetUtil.UTF_8));
 		ctx.getChannel().write(response).addListener(ChannelFutureListener.CLOSE);
 	}

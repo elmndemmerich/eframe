@@ -166,7 +166,6 @@ public class RouteMapping {
 				temp = temp.substring(0, temp.lastIndexOf("/"))+"{id}";
 			}
 		}
-		System.err.println("the route:"+temp);
 		if(containRoute(temp, requestType)){
 			return map.get(url+"_"+requestType);
 		}

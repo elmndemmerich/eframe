@@ -1,0 +1,26 @@
+<html>
+	<head>
+		#include("/meta.vm")
+	</head>
+	
+	<body>
+		<table>
+			<thead>
+				<tr>
+					<td>id</td>
+					<td>name</td>
+					<td>password</td>
+				</tr>
+			</thead>
+			<tbody>
+			#foreach( $item in $list )
+				<tr>
+					<td>$item.id</td>
+					<td>$item.name</td>
+					<td>$item.password</td>
+				</tr>
+			#end
+			</tbody>
+		</table>
+	</body>
+</html>
