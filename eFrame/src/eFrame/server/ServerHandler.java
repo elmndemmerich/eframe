@@ -19,12 +19,14 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 
+import eFrame.annotations.ActionBean;
 import eFrame.constants.Encoding;
 import eFrame.container.EntityContainer;
 import eFrame.exception.DispatchRequestException;
 import eFrame.exception.ServiceInitException;
 import eFrame.route.Route;
 import eFrame.route.RouteMapping;
+import eFrame.server.action.BaseAction;
 import eFrame.server.http.ServerHttpRequest;
 import eFrame.utils.Configuration;
 
@@ -100,8 +102,14 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 		String method = temp[1];
 		Object obj = container.getBean(action);
 		try {
-			obj.getClass().getMethod("setRequest").invoke(request);
-			obj.getClass().getMethod(method).invoke(obj);
+			if(obj instanceof BaseAction && obj.getClass().isAnnotationPresent(ActionBean.class)){
+				obj.getClass().getMethod("setRequest").invoke(request);
+				ActionBean ab = obj.getClass().getAnnotation(ActionBean.class);
+				obj.getClass().getMethod("setResponse").invoke(ab.resultType(), ab.responseCharset());
+				obj.getClass().getMethod(method).invoke(obj);			
+			}else{
+				throw new DispatchRequestException("error invoking dispatchRequest！"+obj.getClass().getName());				
+			}
 		} catch (Exception e) {
 			throw new DispatchRequestException("error invoking dispatchRequest！", e);
 		}
