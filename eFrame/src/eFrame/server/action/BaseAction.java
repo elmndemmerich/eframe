@@ -1,5 +1,7 @@
 package eFrame.server.action;
 
+import eFrame.server.http.ServerHttpRequest;
+
 /**
  * action类都继承这个类
  * <br>
@@ -9,5 +11,15 @@ package eFrame.server.action;
  * @alias E.E.
  */
 public abstract class BaseAction {
+	
+	private ServerHttpRequest request;
+
+	public ServerHttpRequest getRequest() {
+		return request;
+	}
+
+	public void setRequest(ServerHttpRequest request) {
+		this.request = request;
+	}
 	
 }

@@ -14,6 +14,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import eFrame.utils.MathUtil;
+
 /**
  * 路由映射
  * 1、读取路由配置。
@@ -88,7 +90,9 @@ public class RouteMapping {
 		return node.getNodeValue();
 	}
 	
-	/** 读取xml，做读取路由映射设定 */
+	/** 
+	 * 读取xml，做读取路由映射设定
+	 * */
 	private RouteMapping(){
 		try{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -125,44 +129,56 @@ public class RouteMapping {
 	}	
 	
 	/**
-	 * 
-	 * @param uri 请求的地址
+	 * 判定有没有这个路由地址
+	 * @param url 请求的地址
 	 * @param methodType 请求类型
 	 * @return
 	 */
-	public boolean containRoute(String uri, String methodType){
-		/*String temp = uri.replaceAll("\\", "/");
-		//去掉最后一个 '/'
-		if(temp.endsWith("/") && temp.length()>1){
-			temp = temp.substring(0, temp.length()-1);
-		}*/
-		
-		return false;
-	}
-	
-	public boolean containRoute(String url){
+	public boolean containRoute(String url, String methodType){
 		if(url==null||"".equals(url.trim())){
 			return false;
 		}		
-		if(this.map.containsKey(url)){
-			return true;
+		String temp = url+"_"+methodType;
+		if(this.map.containsKey(temp)){
+			Route route = this.map.get(temp);
+			if(route!=null){
+				return true;				
+			}
 		}
-		return false;
-	}	
+		return false;		
+	}
 	
-	public Route getRoute(String url){
-		if(containRoute(url)){
-			return map.get(url);
-		}else{
-			return null;
+	/**
+	 * 根据请求类型和请求的url，得出路由
+	 * 这里对请求的url进行判定。
+	 * @param url url
+	 * @param requestType POST/GET
+	 * @return
+	 */
+	public Route getRoute(String url, String requestType){
+		String temp = url;
+		//多个段: action/user/list ...
+		//判定是不是数字形
+		String[] arr = temp.split("/");
+		if(arr.length>1){
+			String subFix = arr[arr.length-1];
+			if(MathUtil.isNumber(subFix)){
+				temp = temp.substring(0, temp.lastIndexOf("/"))+"{id}";
+			}
 		}
+		System.err.println("the route:"+temp);
+		if(containRoute(temp, requestType)){
+			return map.get(url+"_"+requestType);
+		}
+		
+		return null;
 	}
 	
 	private void addRoute(Route route){
 		if(map.containsKey(route.getUrl())){
 			throw new RuntimeException("route already exists!! route url:"+route.getUrl());
 		}else{
-			this.map.put(route.getUrl(), route);
+			this.map.put(route.getUrl()+"_"+route.getReqMethodType().toUpperCase(), route);
 		}
 	}
 }

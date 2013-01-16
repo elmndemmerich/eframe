@@ -20,8 +20,13 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 
 import eFrame.constants.Encoding;
+import eFrame.container.EntityContainer;
+import eFrame.exception.DispatchRequestException;
+import eFrame.exception.ServiceInitException;
+import eFrame.route.Route;
 import eFrame.route.RouteMapping;
 import eFrame.server.http.ServerHttpRequest;
+import eFrame.utils.Configuration;
 
 /**
  * 请求分发器
@@ -33,12 +38,23 @@ import eFrame.server.http.ServerHttpRequest;
  */
 public class ServerHandler extends SimpleChannelUpstreamHandler{
 
-	private Logger logger = Logger.getLogger(ServerHandler.class);
+	private static Logger logger = Logger.getLogger(ServerHandler.class);
 	
 	/** 有没有过滤器。先略过。 */
 	private boolean hasFilter = false;
 	/** 路由映射相关。并且是否全匹配在此映射中。 */
 	private RouteMapping routeMapping = RouteMapping.getInstance();
+	
+	private static EntityContainer container = EntityContainer.getInstance();
+	
+	static{
+		try{
+			String configs = Configuration.getInstance().get("context.properties", "toScanPackage");
+			container.invoke(configs.split(","));
+		}catch(Exception e){
+			throw new ServiceInitException("init container error!",e);
+		}
+	}
 	
 	/**
 	 * 根据请求， 分发
@@ -57,11 +73,16 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 		}		
 		//自定义请求
 		ServerHttpRequest request = new ServerHttpRequest(nettyRequest, remoteAddress);
-		if(routeMapping.getRoute(request.getUri())==null){
+		//如果没有这个路由
+		String requestType = request.getMethod().getName();
+		String uri = request.getUri();		
+		Route existsRoute = routeMapping.getRoute(uri, requestType);
+		if(existsRoute==null){
 			sendNotFound(ctx, HttpResponseStatus.OK, 
 					"no route found.</br>the request uri is:"+request.getUri());					
 		}else{
-			dispatchRequest(request);
+			//有这个路由
+			dispatchRequest(request, existsRoute);
 		}
 	}
 	
@@ -70,12 +91,20 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 	 * step1:查看路由映射中有没有；
 	 * step2:能否catch all。
 	 * step3:就是没有了就说没有~
-	 * @param request
+	 * @param request 请求
+	 * @param route 路由
 	 */
-	private void dispatchRequest(ServerHttpRequest request){
-		String methodType = request.getMethod().getName();
-		String uri = request.getUri();
-		
+	private void dispatchRequest(ServerHttpRequest request, Route route){
+		String[] temp = route.getMethod().split(".");
+		String action = temp[0];
+		String method = temp[1];
+		Object obj = container.getBean(action);
+		try {
+			obj.getClass().getMethod("setRequest").invoke(request);
+			obj.getClass().getMethod(method).invoke(obj);
+		} catch (Exception e) {
+			throw new DispatchRequestException("error invoking dispatchRequest！", e);
+		}
 	}
 	
 	/**

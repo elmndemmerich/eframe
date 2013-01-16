@@ -2,6 +2,7 @@
 <routes>
 	<!-- 
 		路由映射——外面对服务器做什么？ RESTFUL风格URL 
+		路由只支持'/'，不支持'\'
 	-->
 	<!-- 获取用户列表 -->
 	<route url="/" method="action.getUserList" requsetType="POST" />
