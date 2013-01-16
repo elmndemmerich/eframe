@@ -11,27 +11,21 @@ import eFrame.annotations.ActionType;
 import eFrame.annotations.Wired;
 import eFrame.server.action.BaseAction;
 
-@ActionBean(name="user", resultType=ActionType.page)
+@ActionBean(name="user")
 public class Action extends BaseAction{
 	
 	@Wired(name="service")
 	private Service service;	
 	
-	@ActionMethodType(template="")
+	@ActionMethodType(template="userList.vm", resultType=ActionType.page)
 	public Object getUserList(){
 		try {
 			List<User> list = service.getUserList();
-			for(User user:list){
-				System.out.println(user.getId()+" || " +
-							user.getName()+" || " +
-							user.getPassword()+" || "+
-							user.getPhone()+" || "+
-							user.getEmail());
-			}
+			getContext().put("list", list);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return getContext();
 	}
 	
 	public Object add(User u){

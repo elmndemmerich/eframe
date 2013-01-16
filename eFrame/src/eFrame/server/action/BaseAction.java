@@ -1,5 +1,7 @@
 package eFrame.server.action;
 
+import org.apache.log4j.Logger;
+import org.apache.velocity.VelocityContext;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponse;
@@ -18,6 +20,20 @@ import eFrame.server.http.ServerHttpRequest;
  * @alias E.E.
  */
 public abstract class BaseAction {
+	
+	private ThreadLocal<VelocityContext> context = new ThreadLocal<VelocityContext>();
+	
+	protected VelocityContext getContext(){
+		if(context.get()==null){
+			context.set(new VelocityContext());
+		}
+		context.get().put("basePath", request.getBasePath());
+		context.get().put("encoding", request.getEncoding());
+		context.get().put("userAgent", request.getUserAgent());
+		return context.get();
+	}
+	
+	protected Logger logger = Logger.getLogger("actionLog");
 	
 	protected HttpResponse response;
 	
@@ -48,5 +64,4 @@ public abstract class BaseAction {
 			response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/xml; charset="+responseCharset);			
 		}
 	}	
-	
 }

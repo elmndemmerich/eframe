@@ -11,14 +11,5 @@ public @interface ActionBean{
 	/** bean Name */
 	public String name();
 	
-	/** 
-	 * 返回类型:
-	 * 1:页面；
-	 * 2:json;
-	 * 3:xml
-	 * 4:文件(流)
-	 * */
-	public ActionType resultType() default ActionType.page;
-	
 	public String responseCharset() default "UTF-8";
 }

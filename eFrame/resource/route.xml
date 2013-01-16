@@ -5,16 +5,16 @@
 		路由只支持'/'，不支持'\'
 	-->
 	<!-- 获取用户列表 -->
-	<route url="/" method="action.getUserList" requsetType="POST" />
+	<route url="/" method="user.getUserList" requsetType="GET" />
 	
 	<!-- 获取某个用户 get by id -->
-	<route url="/getUser/{id}" method="action.getUser" requsetType="POST" />
+	<route url="/getUser/{id}" method="user.getUser" requsetType="GET" />
 
 	<!-- 删除 -->
-	<route url="/delUser/{id}" method="action.delUser" requsetType="POST" />
+	<route url="/delUser/{id}" method="user.delUser" requsetType="GET" />
 	
 	<!-- 修改 -->
-	<route url="/updateUser/{id}" method="action.updateUser" requsetType="POST" />	
+	<route url="/updateUser/{id}" method="user.updateUser" requsetType="GET" />	
 
 	<!-- 如果没有配置这个路径，但是action中有这个类，匹配不匹配下去。 可选项:true/false -->
 	<configuration catchAll="true" />

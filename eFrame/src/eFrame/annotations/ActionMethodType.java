@@ -15,5 +15,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ActionMethodType {
-	String template();
+	String template() default "";
+	
+	/** 
+	 * 返回类型:
+	 * 页面；
+	 * json;
+	 * xml;
+	 * 文件(流)
+	 * */
+	public ActionType resultType() default ActionType.page;	
 }

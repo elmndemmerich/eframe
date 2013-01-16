@@ -24,7 +24,7 @@ public class Dao extends BaseDao<User>{
 	 * @throws Exception 
 	 */
 	public List<User> getUserList(){
-		List<User> list = getList("select * from t_user");
+		List<User> list = getList("select * from t_user limit 0, 50");
 		return list;
 	}
 	

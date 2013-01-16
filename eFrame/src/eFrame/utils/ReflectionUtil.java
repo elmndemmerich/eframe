@@ -1,6 +1,7 @@
 package eFrame.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,4 +122,13 @@ public class ReflectionUtil {
 		return "set"+fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 	}	
 	
+	
+	public static Method getMethod(Object obj, String methodName){
+		for(Method m : obj.getClass().getMethods()){
+			if(m.getName().equalsIgnoreCase(methodName)){
+				return m;
+			}
+		}
+		return null;
+	}
 }
