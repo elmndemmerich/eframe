@@ -6,17 +6,19 @@ import com.entity.User;
 import com.service.Service;
 
 import eFrame.annotations.ActionBean;
+import eFrame.annotations.ActionMethodType;
 import eFrame.annotations.ActionType;
 import eFrame.annotations.Wired;
 import eFrame.server.action.BaseAction;
 
-@ActionBean(name="action", resultType=ActionType.page)
+@ActionBean(name="user", resultType=ActionType.page)
 public class Action extends BaseAction{
 	
 	@Wired(name="service")
 	private Service service;	
 	
-	public String getUserList(){
+	@ActionMethodType(template="")
+	public Object getUserList(){
 		try {
 			List<User> list = service.getUserList();
 			for(User user:list){
@@ -32,7 +34,7 @@ public class Action extends BaseAction{
 		return null;
 	}
 	
-	public int add(User u){
+	public Object add(User u){
 		return service.add(u);
 	}
 	
