@@ -9,7 +9,8 @@ import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.HashedWheelTimer;
 
-import eFrame.utils.Configuration;
+import com.utils.Configuration;
+
 
 /**
  * 

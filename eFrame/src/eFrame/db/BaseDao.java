@@ -9,11 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.utils.DBUtil;
+
 import eFrame.annotations.db.Column;
 import eFrame.annotations.db.ColumnType;
 import eFrame.annotations.db.TableBean;
 import eFrame.exception.DaoException;
-import eFrame.utils.DBUtil;
 import eFrame.utils.ReflectionUtil;
 
 /**

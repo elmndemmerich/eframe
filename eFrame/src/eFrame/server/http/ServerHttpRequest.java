@@ -22,10 +22,11 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
+import com.utils.Configuration;
+
 import eFrame.server.FileChannelBuffer;
 import eFrame.server.http.paramParser.TextParser;
 import eFrame.server.http.paramParser.base.DataParser;
-import eFrame.utils.Configuration;
 
 /**
  * 自定义请求

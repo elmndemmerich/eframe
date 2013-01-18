@@ -7,9 +7,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.utils.Configuration;
 
 import eFrame.db.pool.base.IPool;
-import eFrame.utils.Configuration;
 
 /**
  * c3p0连接池实现

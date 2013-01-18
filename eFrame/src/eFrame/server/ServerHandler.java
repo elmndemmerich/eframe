@@ -26,6 +26,7 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 
 import com.Test;
+import com.utils.Configuration;
 
 import eFrame.annotations.ActionBean;
 import eFrame.annotations.ActionMethodType;
@@ -38,7 +39,6 @@ import eFrame.route.Route;
 import eFrame.route.RouteMapping;
 import eFrame.server.action.BaseAction;
 import eFrame.server.http.ServerHttpRequest;
-import eFrame.utils.Configuration;
 import eFrame.utils.ReflectionUtil;
 
 /**
@@ -63,12 +63,25 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 	
 	static{
 		try{
-			//初始化velocity的路径
-			Properties p = new Properties();
+			//初始化velocity模板的路径
+			Properties properties = new Properties();
 			String path = new Test().getClass().getResource("/").toString()  
 	                .replaceAll("^file:/", "")+Configuration.getInstance().get("context.properties", "velocity.templatePath");  
-	        p.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, path);
-			Velocity.init(p);
+	        properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, path);
+	        //velocity日志
+	        properties.setProperty("runtime.log.error.stacktrace", 
+	        		Configuration.getInstance().get("context.properties", "runtime.log.error.stacktrace"));
+	        properties.setProperty("runtime.log.warn.stacktrace", 
+	        		Configuration.getInstance().get("context.properties", "runtime.log.warn.stacktrace"));
+	        properties.setProperty("runtime.log.info.stacktrace", 
+	        		Configuration.getInstance().get("context.properties", "runtime.log.info.stacktrace"));
+	        properties.setProperty("runtime.log.logsystem.class", 
+	        		Configuration.getInstance().get("context.properties", "runtime.log.logsystem.class"));
+	        properties.setProperty("runtime.log.logsystem.log4j.category", 
+	        		Configuration.getInstance().get("context.properties", "runtime.log.logsystem.log4j.category"));
+	        properties.setProperty(Velocity.RUNTIME_LOG, 
+	        		Configuration.getInstance().get("context.properties", "runtime.log.logsystem.log4j.category"));	        
+			Velocity.init(properties);
 			//初始化包扫描的路径
 			String configs = Configuration.getInstance().get("context.properties", "toScanPackage");
 			container.invoke(configs.split(","));
@@ -78,7 +91,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 	}
 	
 	/**
-	 * 对比container里面的bean和uri，全匹配的话能偶对应得上
+	 * 对比container里面的bean和uri，全匹配的话能对应得上
 	 * @param uri
 	 * @return
 	 */

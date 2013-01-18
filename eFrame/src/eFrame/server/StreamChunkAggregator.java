@@ -16,7 +16,8 @@ import org.jboss.netty.handler.codec.http.HttpChunk;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMessage;
 
-import eFrame.utils.Configuration;
+import com.utils.Configuration;
+
 
 public class StreamChunkAggregator extends SimpleChannelUpstreamHandler{
     private volatile HttpMessage currentMessage;

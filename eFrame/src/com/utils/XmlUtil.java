@@ -1,4 +1,4 @@
-package eFrame.utils;
+package com.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * 测试工具类
+ * <br>
+ * @date 2013-1-18
+ * @author LiangRL
+ * @alias E.E.
+ */
 public class XmlUtil {
 	
 	static void out(Node baseNode){

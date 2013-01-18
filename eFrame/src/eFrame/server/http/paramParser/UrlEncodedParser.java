@@ -10,9 +10,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.utils.Configuration;
+
 import eFrame.server.http.paramParser.base.DataParser;
 import eFrame.utils.CollectionUtil;
-import eFrame.utils.Configuration;
 
 
 public class UrlEncodedParser extends DataParser{
