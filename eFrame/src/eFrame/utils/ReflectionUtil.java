@@ -90,6 +90,24 @@ public class ReflectionUtil {
 	}
 	
 	/**
+	 * 用于select * 
+	 * @param entity
+	 * @return
+	 */
+	public static String getEntityFields(Object entity){
+		StringBuilder result = new StringBuilder();
+		String entityName = entity.getClass().getCanonicalName();
+		if(!entity.getClass().isAnnotationPresent(TableBean.class)){
+			throw new RuntimeException("entity:"+entityName +" MUST own TableBean annotation!");
+		}
+		for(Field f:entity.getClass().getDeclaredFields()){
+			result.append(f.getName());
+			result.append(",".intern());
+		}
+		return result.toString().substring(0, result.length()-1);
+	}	
+	
+	/**
 	 * 取出entity的类名
 	 * @param entity
 	 * @return

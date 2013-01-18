@@ -78,6 +78,15 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 	}
 	
 	/**
+	 * 对比container里面的bean和uri，全匹配的话能偶对应得上
+	 * @param uri
+	 * @return
+	 */
+	private boolean match(String uri){
+		return false;
+	}
+	
+	/**
 	 * 根据请求， 分发
 	 * @param ctx
 	 * @param e
@@ -97,13 +106,17 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 		//如果没有这个路由
 		String requestType = request.getMethod().getName();
 		String uri = request.getUri();		
-		Route existsRoute = routeMapping.getRoute(uri, requestType);
-		if(existsRoute==null){
-			sendMsg(ctx, HttpResponseStatus.OK, 
-					"no route found.</br>the request uri is:"+request.getUri());					
-		}else{
+		Route existsRoute = routeMapping.getRoute(uri, requestType, request);
+		if(existsRoute!=null){
 			//有这个路由
-			dispatchRequest(request, existsRoute, ctx);
+			dispatchRequest(request, existsRoute, ctx);			
+		}else if(routeMapping.isCatchAll() && match(uri)){
+			//全匹配为on && 全匹配匹配上这个uri
+			sendMsg(ctx, HttpResponseStatus.OK, 
+					"no yet match.</br>the request uri is:"+request.getUri());				
+		}else{
+			sendMsg(ctx, HttpResponseStatus.OK, 
+					"no route found.</br>the request uri is:"+request.getUri());	
 		}
 	}
 	
@@ -127,13 +140,10 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 				setRequest.invoke(obj, request);
 				//调用方法
 				Method method = obj.getClass().getMethod(methodName);
-				Object result = method.invoke(obj);			
+				Object result = method.invoke(obj);		
 				//方法注解
 				ActionMethodType amt = method.getAnnotation(ActionMethodType.class);
 				if(amt.resultType()==ActionType.page){	//这个方法是返回页面的
-					if("".equals(amt.template().trim())){
-						throw new RuntimeException(route.getMethod()+" wanna return page, but does NOT own a template!!");
-					}
 					Template template = Velocity.getTemplate(amt.template());
 					StringWriter sw = new StringWriter();
 					template.merge((VelocityContext)result, sw);		

@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -135,6 +136,50 @@ public class DBUtil {
 			conn.close();
 		}		
 	}
+	
+	/**
+	 * as named
+	 * @param sql
+	 * @param p
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Map<String, Object> findById(String sql, Param p) throws SQLException{
+		Map<String, Object> result = new HashMap<String, Object>();
+		C3p0Pool pool = C3p0Pool.getInstance();
+		Connection conn = pool.getConnection();
+		PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		
+		if(p!=null){
+			if(p.getColumnType()==ColumnType.Integer){
+				statement.setInt(1, (Integer)p.getValue());		
+			}else if(p.getColumnType()==ColumnType.BigInt){
+				statement.setLong(1, (Long)p.getValue());		
+			}			
+		}		
+		
+		try{
+			log.info(sql);
+			ResultSet rs = statement.executeQuery();
+			if(rs!=null){  
+				ResultSetMetaData metaData = rs.getMetaData();
+				//遍历每一行
+				while(rs.next()){
+					//每一行的meta信息
+					for(int i = 0; i<metaData.getColumnCount(); ++i){
+						String columnLabel = metaData.getColumnLabel(i+1);
+						Object obj = rs.getObject(columnLabel);
+						result.put(columnLabel, obj);					
+					}
+				}					
+	        }
+			return result;
+		}finally{
+			statement.close();
+			conn.close();
+		}
+	}	
+	
 	
 	/**
 	 * 预编译的insert语句

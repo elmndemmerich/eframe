@@ -18,15 +18,19 @@ public class Action extends BaseAction{
 	private Service service;	
 	
 	@ActionMethodType(template="userList.vm", resultType=ActionType.page)
-	public Object getUserList(){
-		try {
-			List<User> list = service.getUserList();
-			getContext().put("list", list);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public Object getUserList() throws Exception{
+		List<User> list = service.getUserList();
+		getContext().put("list", list);
 		return getContext();
 	}
+
+	@ActionMethodType(template="user.vm", resultType=ActionType.page)
+	public Object getUser(){
+		String id = this.request.getParams().get("id");
+		User user = service.getUser(Integer.parseInt(id));
+		this.getContext().put("user", user);
+		return getContext();
+	}	
 	
 	public Object add(User u){
 		return service.add(u);

@@ -14,6 +14,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import eFrame.server.http.ServerHttpRequest;
 import eFrame.utils.MathUtil;
 
 /**
@@ -151,11 +152,12 @@ public class RouteMapping {
 	/**
 	 * 根据请求类型和请求的url，得出路由
 	 * 这里对请求的url进行判定。
+	 * 另外如果路由中有ID，放置到请求中！！！
 	 * @param url url
 	 * @param requestType POST/GET
 	 * @return
 	 */
-	public Route getRoute(String url, String requestType){
+	public Route getRoute(String url, String requestType, ServerHttpRequest request){
 		String temp = url;
 		//多个段: action/user/list ...
 		//判定是不是数字形
@@ -163,11 +165,12 @@ public class RouteMapping {
 		if(arr.length>1){
 			String subFix = arr[arr.length-1];
 			if(MathUtil.isNumber(subFix)){
-				temp = temp.substring(0, temp.lastIndexOf("/"))+"{id}";
+				temp = temp.substring(0, temp.lastIndexOf("/")+1)+"{id}";
+				request.getParams().put("id", subFix);
 			}
 		}
 		if(containRoute(temp, requestType)){
-			return map.get(url+"_"+requestType);
+			return map.get(temp+"_"+requestType);
 		}
 		
 		return null;

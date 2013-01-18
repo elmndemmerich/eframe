@@ -35,6 +35,10 @@ public class Service {
 		return dao.add(u);
 	}
 	
+	public User getUser(int id){
+		return dao.findById(id);
+	}
+	
 	public void setDao(Dao dao) {
 		this.dao = dao;
 	}	

@@ -23,7 +23,7 @@ public class Server {
 
 	private Logger log = Logger.getLogger(Server.class);
 
-	private boolean isRunning = false;
+	private static boolean isRunning = false;
 	
 	/** 服务器实例 */
 	private static Server instance;
@@ -32,6 +32,8 @@ public class Server {
 
 	private int port;
 
+	private Channel c = null;
+	
 	private Server() {
 		try {
 			String temp = Configuration.getInstance().get("netty.port");
@@ -55,30 +57,29 @@ public class Server {
 		if(isRunning){
 			throw new ServiceInitException("service is launched！");
 		}
-		Channel c = null;
 		try {
 			bootstrap.setPipelineFactory(new ServerPipelineFactory());
 
-			bootstrap.setOption("tcpNoDelay", Configuration.getInstance().get("netty.tcpNoDelay"));
-			c = bootstrap.bind(new InetSocketAddress(port));
+			bootstrap.setOption("child.tcpNoDelay", Configuration.getInstance().get("netty.tcpNoDelay"));
+			bootstrap.setOption("child.keepAlive", Configuration.getInstance().get("netty.keepAlive"));
 			isRunning = true;
+			c = bootstrap.bind(new InetSocketAddress(port));
 			log.info("server start at:"
 					+ DateUtil.getCurrentDateStr(DateUtil.YMD_HMS));
 		} catch (Exception e) {
-			c.disconnect();
 			log.error("server start failed!", e);
+			System.exit(-1);
 		}
 	}
 
 	public void stop() {
+		if(c!=null){
+			c.close();			
+		}
 		bootstrap.releaseExternalResources();
 		isRunning = false;
+		System.exit(-1);
 		log.info("server stopped at:"
 				+ DateUtil.getCurrentDateStr(DateUtil.YMD_HMS));
-	}
-
-	public static void main(String[] args){
-		Server server = Server.getInstance();
-		server.start();
 	}
 }

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eFrame.annotations.db.Column;
 import eFrame.annotations.db.ColumnType;
@@ -73,6 +74,46 @@ public abstract class BaseDao<T> {
 	 */
 	public int deleteById(Long id){
 		return _deleteById(id, ColumnType.BigInt);
+	}
+	
+	public T findById(Integer id){
+		TableBean tb = genericClass.getAnnotation(TableBean.class);
+		String tableName = tb.name();
+		
+		Field[] fields = genericClass.getDeclaredFields();
+		for(Field f:fields){
+			//没有被列注解标注的字段，跳过
+			if(!f.isAnnotationPresent(Column.class)){
+				continue;
+			}
+			Column column = f.getAnnotation(Column.class);
+			//有列注解标注，但不是主键，跳过
+			if(!column.isKey()){
+				continue;				
+			}
+			//剩下的就是有列注解且是主键的字段了
+			try {
+				Constructor<?> c = genericClass.getConstructor();
+				@SuppressWarnings("unchecked")
+				T entity = (T)c.newInstance();
+				
+				String fieldName = f.getName();
+				String sql = "select "+ReflectionUtil.getEntityFields(entity)+" from "+tableName+" where "+fieldName+"=?";
+				Param p = new Param(fieldName, id, ColumnType.Integer);	
+				Map<String, Object> map = DBUtil.findById(sql, p);
+				
+				for(String key:map.keySet()){
+					Object value = map.get(key);
+					String methodName = ReflectionUtil.generateSetMethodName(key);
+					Method method = entity.getClass().getMethod(methodName, value.getClass());
+					method.invoke(entity, value);
+				}				
+				return entity;
+			} catch (Exception e) {
+				throw new DaoException(e.toString(),e); 
+			}
+		}
+		throw new DaoException("generate deleteById sql exception!"); 		
 	}
 	
 	/**

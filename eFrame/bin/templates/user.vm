@@ -1,0 +1,24 @@
+<html>
+	<head>
+		#include("/meta.vm")
+	</head>
+	
+	<body>
+		<table>
+			<thead>
+				<tr>
+					<td>id</td>
+					<td>name</td>
+					<td>password</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>$user.id</td>
+					<td>$user.name</td>
+					<td>$user.password</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>
