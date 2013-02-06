@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 
 public class HttpUtil {
 	
+
+	
 	/**
 	 * 
 	 * @param stream

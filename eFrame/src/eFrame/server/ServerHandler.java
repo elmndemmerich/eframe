@@ -27,6 +27,8 @@ import org.jboss.netty.util.CharsetUtil;
 
 import com.Test;
 import com.utils.Configuration;
+import com.utils.MathUtil;
+import com.utils.StringUtil;
 
 import eFrame.annotations.ActionBean;
 import eFrame.annotations.ActionMethodType;
@@ -65,7 +67,8 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 		try{
 			//初始化velocity模板的路径
 			Properties properties = new Properties();
-			String path = new Test().getClass().getResource("/").toString()  
+			//这个项目中随便一个类来getResource都可以了。
+			String path = properties.getClass().getResource("/").toString()  
 	                .replaceAll("^file:/", "")+Configuration.getInstance().get("context.properties", "velocity.templatePath");  
 	        properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, path);
 	        //velocity日志
@@ -86,16 +89,28 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 			String configs = Configuration.getInstance().get("context.properties", "toScanPackage");
 			container.invoke(configs.split(","));
 		}catch(Exception e){
-			throw new ServiceInitException("init container error!",e);
+			throw new ServiceInitException("init container error!", e);
 		}
 	}
 	
 	/**
-	 * 对比container里面的bean和uri，全匹配的话能对应得上
+	 * 首次已经是匹配不上了；
+	 * 再次对比container里面的bean和uri，全匹配的话能对应得上
+	 * 还是restful风格的匹配
 	 * @param uri
 	 * @return
 	 */
 	private boolean match(String uri){
+		String[] arr = StringUtil.splictUri(uri);
+		if(arr==null){
+			return false;
+		}
+		//举例：user/update/7  ;  user/List
+		//最多只支持3层
+		if(arr.length<=3){
+			// && MathUtil.isNumber(arr[arr.length-1])
+		}
+		//即使是'/'也都是匹配不上了
 		return false;
 	}
 	
@@ -121,12 +136,10 @@ public class ServerHandler extends SimpleChannelUpstreamHandler{
 		String uri = request.getUri();		
 		Route existsRoute = routeMapping.getRoute(uri, requestType, request);
 		if(existsRoute!=null){
-			//有这个路由
 			dispatchRequest(request, existsRoute, ctx);			
 		}else if(routeMapping.isCatchAll() && match(uri)){
-			//全匹配为on && 全匹配匹配上这个uri
 			sendMsg(ctx, HttpResponseStatus.OK, 
-					"no yet match.</br>the request uri is:"+request.getUri());				
+					"TO DO.</br>the request uri is:"+request.getUri());				
 		}else{
 			sendMsg(ctx, HttpResponseStatus.OK, 
 					"no route found.</br>the request uri is:"+request.getUri());	

@@ -77,6 +77,11 @@ public abstract class BaseDao<T> {
 		return _deleteById(id, ColumnType.BigInt);
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public T findById(Integer id){
 		TableBean tb = genericClass.getAnnotation(TableBean.class);
 		String tableName = tb.name();

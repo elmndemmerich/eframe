@@ -1,6 +1,6 @@
 <html>
 	<head>
-		#include("/meta.vm")
+		#include("/commonMeta.vm")
 	</head>
 	
 	<body>
